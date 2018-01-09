@@ -36,8 +36,8 @@
 #define DEBUG
 
 #define sensorPin 15 // pin connecting to the TCRT5000 ..  D8==GPIO15 on NodeMCU
-#define C 600           // 600 revolutions = 1 kWh 
-#define threshold 1   // threshold value of the IR sensor
+#define C 600.0      // 600 revolutions = 1 kWh 
+#define threshold 1  // threshold value of the IR sensor
 #define WIFI_SSID     ""
 #define WIFI_PASSWORD ""
 

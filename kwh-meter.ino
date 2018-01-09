@@ -46,8 +46,7 @@ NTPClient timeClient(ntpUDP, NTP_HOST);
 
 WiFiClient eClient;
 PubSubClient client(MQTT_SERVER, MQTT_PORT, NULL, eClient);
-unsigned long lastReconnectAttempt = 0;
-  
+ 
 // We want to measure consumption over various time ranges
 EnergyMeasures onemin;
 EnergyMeasures tenmin;
@@ -164,7 +163,7 @@ boolean reconnect_mqtt() {
 
 void loop() {
   
-  // house-keeping
+  // house-keeping - MQTT, NTP and ArduinoOTA
   if (!client.connected()) {
     reconnect_mqtt() ;
   }
@@ -187,10 +186,9 @@ void loop() {
     state = true;
   }
 
-  // average energy consumed over time
+  // average energy consumed over time - 1 minute
   if (timeClient.getEpochTime() - onemin.begin_time >= 60) {
-    Serial.println(String(timeClient.getEpochTime()) + "  0000   " + String(onemin.begin_time));
-    double kwh = (count - onemin.begin_count) / 600.0;
+    double kwh = (count - onemin.begin_count) / C;
  #ifdef DEBUG
     Serial.println(timeClient.getFormattedTime() +  " Average energy consumption / minute = "+ String(kwh*60.0*1000.0) + " Watt");
 #endif
@@ -199,8 +197,9 @@ void loop() {
     onemin.begin_count = count;
   }
 
+  // 10 minutes
   if (timeClient.getEpochTime() - tenmin.begin_time >= 600) {
-    double kwh = (count - tenmin.begin_count) / 600.0;
+    double kwh = (count - tenmin.begin_count) / C;
  #ifdef DEBUG
     Serial.println(timeClient.getFormattedTime() + " Average energy consumption / 10 minutes = "  + String(kwh*6.0*1000.0) + " Watt");
 #endif
@@ -208,9 +207,10 @@ void loop() {
     tenmin.begin_time = timeClient.getEpochTime();
     tenmin.begin_count = count;
   }
-      
+
+  // 1 hour
   if (timeClient.getEpochTime() - onehr.begin_time >= 3600) {
-    double kwh = (count - onehr.begin_count) / 600.0;
+    double kwh = (count - onehr.begin_count) / C;
  #ifdef DEBUG
     Serial.println(timeClient.getFormattedTime() + " Average energy consumption / hour = "  + String(kwh*1000.0) + " Watt");
 #endif
@@ -219,8 +219,9 @@ void loop() {
     onehr.begin_count = count;
   }
 
+  // 6 hours
   if (timeClient.getEpochTime() - sixhr.begin_time >= 21600) {
-    double kwh = (count - sixhr.begin_count) / 600.0;
+    double kwh = (count - sixhr.begin_count) / C;
  #ifdef DEBUG
     Serial.println(timeClient.getFormattedTime() + " Average energy consumption / 6 hours = "  + String(kwh/6.0*1000.0) + " Watt");
 #endif
@@ -229,8 +230,9 @@ void loop() {
     sixhr.begin_count = count;
   }
 
+  // 24 hours
   if (timeClient.getEpochTime() - twentyfourhr.begin_time >= 86400) {
-    double kwh = (count - twentyfourhr.begin_count) / 600.0;
+    double kwh = (count - twentyfourhr.begin_count) / C;
 #ifdef DEBUG
     Serial.println(timeClient.getFormattedTime() + " Average energy consumption / 24 hours = "  + String(kwh/24.0*1000.0) + " Watt");
 #endif
@@ -239,9 +241,10 @@ void loop() {
     twentyfourhr.begin_count = count;
   }
 
+  // count kWh consumed over a single day (from midnight to midnight)
   if (timeClient.getDay() != daily.begin_time) {
     if (daily.begin_count != 0) {
-      double kwh=(count - daily.begin_count) / 600.0;
+      double kwh=(count - daily.begin_count) / C;
 #ifdef DEBUG
       Serial.println("Energy consumed over an entire day in kWh = " + String(kwh));
 #endif
@@ -249,6 +252,6 @@ void loop() {
     }
     
     daily.begin_count = count;
-    daily.begin_time = timeClient.getDay();
+    daily.begin_time = timeClient.getDay(); // getDay() returns an int representing day of the week (Sunday = 0)
   }
 }

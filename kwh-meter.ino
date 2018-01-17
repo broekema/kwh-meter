@@ -203,6 +203,8 @@ void loop() {
       kwh = (count - tenmin.begin_count) * 6.0 * 1000.0 / C;
 #ifdef DEBUG
       Serial.println(timeClient.getFormattedTime() + " average energy consumption / 10 minutes = " + String(kwh) + " Watt");
+      // Send time as the ESP board sees it every ten minutes for debugging
+      client.publish(TIMETOPIC, String(timeClient.getFormattedTime()).c_str());
 #endif
       client.publish(TENMINSUBJECT, String(kwh).c_str());
       tenmin.begin_count = count;

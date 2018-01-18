@@ -224,7 +224,7 @@ void loop() {
 	// at the top of the hour,
 	// when #hours is divisable by 6,
 	// generate per six hour metric
-	kwh = (count - sixhr.begin_count) * 1000.0 / 6.0;
+	kwh = (count - sixhr.begin_count) * 1000.0 / C / 6.0;
 #ifdef DEBUG
 	Serial.println(timeClient.getFormattedTime() + " Average energy consumption / 6 hours = "  + String(kwh) + " Watt");
 #endif

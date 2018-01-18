@@ -35,7 +35,7 @@
 //#define DEBUG_NTPClient
 #define DEBUG
 
-#define sensorPin 15 // pin connecting to the TCRT5000 ..  D8==GPIO15 on NodeMCU
+#define sensorPin 12 // pin connecting to the TCRT5000 ..  D6==GPIO12 on NodeMCU
 #define C 600.0      // 600 revolutions = 1 kWh 
 #define threshold 1  // threshold value of the IR sensor, set to 1 for digital output
 
